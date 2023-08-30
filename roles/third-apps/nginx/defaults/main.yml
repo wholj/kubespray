@@ -1,0 +1,3 @@
+---
+third_apps_nginx_enabled: false
+third_apps_nginx_namespace: "third-apps-nginx"

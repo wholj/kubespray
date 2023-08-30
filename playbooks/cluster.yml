@@ -123,6 +123,17 @@
     - { role: kubernetes-apps/external_provisioner, tags: external-provisioner }
     - { role: kubernetes-apps, tags: apps }
 
+# 部署第三方自定义的应用
+- name: Install Third apps
+  hosts: kube_control_plane
+  gather_facts: False
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  environment: "{{ proxy_disable_env }}"
+  roles:
+    - { role: kubespray-defaults }
+    - { role: third-apps/nginx, tags: third-apps-nginx }
+    - { role: third-apps, tags: third-apps }
+
 - name: Apply resolv.conf changes now that cluster DNS is up
   hosts: k8s_cluster
   gather_facts: False

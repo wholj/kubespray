@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: third-apps-nginx
+  name: third-apps-nginx
+spec:
+  selector:
+    matchLabels:
+      app: third-apps-nginx
+  template:
+    metadata:
+      labels:
+        app: third-apps-nginx
+    spec:
+      containers:
+      - name: third-apps-nginx
+        image: 10.70.8.100:8090/kubespray/library/nginx:1.23.2-alpine
+        ports:
+        - containerPort: 80
+          name: http-80

@@ -1,0 +1,42 @@
+---
+- name: Third Apps Nginx | Create third-apps dir
+  file:
+    path: "{{ kube_config_dir }}/third-apps/nginx"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - third_apps_nginx_enabled
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Third Apps Nginx | Templates list
+  set_fact:
+    nginx_templates:
+      - { name: 00-namespace, file: 00-namespace.yml, type: ns }
+      - { name: 01-deployment, file: 01-deployment.yml, type: deploy }
+      - { name: 02-services, file: 02-services.yml, type: svc }
+
+- name: Third Apps Nginx | Create manifests
+  template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ kube_config_dir }}/third-apps/nginx/{{ item.file }}"
+    mode: 0644
+  with_items: "{{ nginx_templates }}"
+  register: nginx_manifests
+  when:
+    - third_apps_nginx_enabled
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: Third Apps Nginx | Apply manifests
+  kube:
+    name: "{{ item.item.name }}"
+    namespace: "{{ third_apps_nginx_namespace }}"
+    kubectl: "{{ bin_dir }}/kubectl"
+    resource: "{{ item.item.type }}"
+    filename: "{{ kube_config_dir }}/third-apps/nginx/{{ item.item.file }}"
+    state: "latest"
+  with_items: "{{ nginx_manifests.results }}"
+  when:
+    - third_apps_nginx_enabled
+    - inventory_hostname == groups['kube_control_plane'][0]
