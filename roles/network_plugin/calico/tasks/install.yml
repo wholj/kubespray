@@ -377,6 +377,21 @@
     - inventory_hostname in groups['kube_control_plane']
     - typha_enabled
 
+# 如果需要配置 BGP 密码，则新增 secret、role、rolebinding 的 manifests
+- name: Calico | Create calico secret manifests for BGP peer password
+  template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ kube_config_dir }}/{{ item.file }}"
+    mode: 0644
+  with_items:
+    - {name: calico, file: calico-bgp-secret.yml, type: secret}
+    - {name: calico, file: calico-role-secret-access.yml, type: role}
+    - {name: calico, file: calico-rolebinding-secret-access.yml, type: rolebinding}
+  register: calico_bgp_password_manifest
+  when:
+    - bgp_password != ""
+    - inventory_hostname in groups['kube_control_plane']
+
 - name: Calico | get calico apiserver caBundle
   command: "{{ bin_dir }}/kubectl get secret -n calico-apiserver calico-apiserver-certs -o jsonpath='{.data.apiserver\\.crt}'"
   changed_when: false
@@ -415,6 +430,7 @@
   with_items:
     - "{{ calico_node_manifests.results }}"
     - "{{ calico_node_typha_manifest.results }}"
+    - "{{ calico_bgp_password_manifest.results }}"
   when:
     - inventory_hostname == groups['kube_control_plane'][0]
     - not item is skipped

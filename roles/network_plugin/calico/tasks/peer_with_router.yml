@@ -12,7 +12,17 @@
       },
       "spec": {
         "asNumber": "{{ item.as }}",
+        {% if bgp_password == "" %}
         "peerIP": "{{ item.router_id }}"
+        {% else %}
+        "peerIP": "{{ item.router_id }}",
+        "password": {
+          "secretKeyRef": {
+            "key": "bgp-password",
+            "name": "bgp-secret"
+          }
+        }
+        {% endif %}
       }}
   register: output
   retries: 4

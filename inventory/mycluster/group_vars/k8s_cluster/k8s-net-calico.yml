@@ -7,7 +7,7 @@ calico_cni_name: k8s-pod-network
 ## With calico it is possible to distributed routes with border routers of the datacenter.
 ## Warning : enabling router peering will disable calico's default behavior ('node mesh').
 ## The subnets of each nodes will be distributed by the datacenter router
-# peer_with_router: false
+peer_with_router: true
 
 # Enables Internet connectivity from containers
 # nat_outgoing: true
@@ -129,3 +129,19 @@ calico_pool_blocksize: 26
 
 # Calico apiserver (only with kdd)
 # calico_apiserver_enabled: false
+
+# 定义上行路由器的信息
+# peers:
+#   - router_id: "10.99.0.2"
+#     as: "65xxx"
+#     scope: "global"
+#     sourceaddress: "None"
+peers:
+  - router_id: "10.99.0.2"
+    as: "65000"
+    scope: "global"
+    sourceaddress: "None"
+
+# BGP password
+# bgp_password: ""
+bgp_password: "changeme"

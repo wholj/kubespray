@@ -169,3 +169,6 @@ calico_feature_detect_override: ""
 
 # Calico kubeconfig wait timeout in seconds
 calico_kubeconfig_wait_timeout: 300
+
+# BGP password，默认为空
+bgp_password: ""
