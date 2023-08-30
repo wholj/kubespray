@@ -34,3 +34,11 @@
     owner: root
     group: root
   become: true
+
+# 自定义 nerdctl 登陆步骤
+- name: Nerdctl | Login registry
+  shell: "{{ bin_dir }}/nerdctl login {{ registry_address }} -u{{ registry_username }} -p{{ registry_password }}"
+  run_once: true
+  changed_when: false
+  when:
+    registry_address != ""

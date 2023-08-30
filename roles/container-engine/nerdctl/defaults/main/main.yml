@@ -1,0 +1,4 @@
+# nerdctl 认证登陆镜像仓库，从 inventory/mycluster/group_vars/all/containerd.yml 读取变量 containerd_registry_auth
+registry_address: "{{ containerd_registry_auth[0]['registry'] }}"
+registry_username: "{{ containerd_registry_auth[0]['username'] }}"
+registry_password: "{{ containerd_registry_auth[0]['password'] }}"
