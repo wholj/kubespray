@@ -65,7 +65,9 @@ if [ -e "$SSLDIR/ca-key.pem" ]; then
     cp $SSLDIR/{ca.pem,ca-key.pem} .
 else
     openssl genrsa -out ca-key.pem {{certificates_key_size}} > /dev/null 2>&1
-    openssl req -x509 -new -nodes -key ca-key.pem -days {{certificates_duration}} -out ca.pem -subj "/CN=etcd-ca" > /dev/null 2>&1
+    # 将 etcd 的证书颁发机构修改为 APIServer 的证书颁发机构，即将 "CN=etcd-ca" 修改为 "CN=kubernetes"
+    # openssl req -x509 -new -nodes -key ca-key.pem -days {{certificates_duration}} -out ca.pem -subj "/CN=etcd-ca" > /dev/null 2>&1
+    openssl req -x509 -new -nodes -key ca-key.pem -days {{certificates_duration}} -out ca.pem -subj "/CN=kubernetes" > /dev/null 2>&1
 fi
 
 # ETCD member

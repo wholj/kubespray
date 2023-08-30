@@ -15,6 +15,8 @@
 ## etcd documentation for more information.
 # 8G is a suggested maximum size for normal environments and etcd warns at startup if the configured value exceeds it.
 # etcd_quota_backend_bytes: "2147483648"
+# 不能写成 "8G" 这种格式
+etcd_quota_backend_bytes: "8589934592"
 
 # Maximum client request size in bytes the server will accept.
 # etcd is designed to handle small key value pairs typical for metadata.
