@@ -108,4 +108,4 @@ krew_download_url: "{{ files_repo }}/github.com/kubernetes-sigs/krew/releases/do
 # containerd_ubuntu_repo_repokey: 'YOURREPOKEY'
 
 #download_delegate if download_force_cache else inventory_hostname
-download_run_once: True
+download_run_once: False
