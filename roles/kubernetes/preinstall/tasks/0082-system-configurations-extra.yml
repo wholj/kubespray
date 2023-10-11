@@ -1,0 +1,170 @@
+---
+- name: stat sysctl file configuration
+  stat:
+    path: "{{ sysctl_file_path }}"
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: sysctl_file_stat
+  tags:
+    - bootstrap-os
+
+- name: change sysctl file path to link source if linked
+  set_fact:
+    sysctl_file_path: "{{ sysctl_file_stat.stat.lnk_source }}"
+  when:
+    - sysctl_file_stat.stat.islnk is defined
+    - sysctl_file_stat.stat.islnk
+  tags:
+    - bootstrap-os
+
+- name: make sure sysctl file path folder exists
+  file:
+    name: "{{ sysctl_file_path | dirname }}"
+    state: directory
+    mode: 0755
+
+#=================================================================
+- name: Enable net.ipv4.conf.all.rp_filter
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.conf.all.rp_filter
+    value: "0"
+    state: present
+    reload: yes
+
+- name: Enable net.ipv4.conf.default.rp_filter
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.conf.default.rp_filter
+    value: "0"
+    state: present
+    reload: yes
+
+- name: modify vm.max_map_count value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: vm.max_map_count
+    value: "262144"
+    state: present
+    reload: yes
+
+- name: modify fs.inotify.max_user_instances value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: fs.inotify.max_user_instances
+    value: "8192"
+    state: present
+    reload: yes
+
+- name: modify net.core.somaxconn value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.core.somaxconn
+    value: "4096"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_rfc1337 value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_rfc1337
+    value: "1"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.ip_early_demux value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.ip_early_demux
+    value: "0"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_synack_retries value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_synack_retries
+    value: "1"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_syn_retries value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_syn_retries
+    value: "3"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_max_syn_backlog value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_max_syn_backlog
+    value: "8196"
+    state: present
+    reload: yes
+
+- name: modify net.core.netdev_max_backlog value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.core.netdev_max_backlog
+    value: "65536"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.ip_local_port_range value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.ip_local_port_range
+    value: "1024 65535"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_fin_timeout value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_fin_timeout
+    value: "30"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_tw_reuse value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_tw_reuse
+    value: "1"
+    state: present
+    reload: yes
+
+- name: modify net.ipv4.tcp_orphan_retries value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.tcp_orphan_retries
+    value: "2"
+    state: present
+    reload: yes
+
+- name: Modprobe nf_conntrack_ipv4
+  community.general.modprobe:
+    name: nf_conntrack_ipv4
+    state: present
+  register: modprobe_nf_conntrack_ipv4
+  ignore_errors: true  # noqa ignore-errors
+
+- name: Persist nf-conntrack-ipv4 modules
+  copy:
+    dest: /etc/modules-load.d/nf-conntrack-ipv4.conf
+    mode: 0644
+    content: |
+      {% if modprobe_nf_conntrack_ipv4 is success -%}
+      nf_conntrack_ipv4
+      {%-   endif -%}
+
+- name: modify net.netfilter.nf_conntrack_max value
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.netfilter.nf_conntrack_max
+    value: "1048576"
+    state: present
+    reload: yes

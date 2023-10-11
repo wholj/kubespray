@@ -76,6 +76,13 @@
   tags:
     - bootstrap-os
 
+- name: Apply extra system configurations
+  import_tasks: 0082-system-configurations-extra.yml
+  when:
+    - not dns_late
+  tags:
+    - bootstrap-os
+
 - name: Configure NTP
   import_tasks: 0081-ntp-configurations.yml
   when:
