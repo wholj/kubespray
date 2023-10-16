@@ -87,6 +87,22 @@
     reload: yes
   when: enable_dual_stack_networks | bool
 
+- name: Enable net.ipv4.conf.all.rp_filter
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.conf.all.rp_filter
+    value: "0"
+    state: present
+    reload: yes
+
+- name: Enable net.ipv4.conf.default.rp_filter
+  ansible.posix.sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.conf.default.rp_filter
+    value: "0"
+    state: present
+    reload: yes
+
 - name: Check if we need to set fs.may_detach_mounts
   stat:
     path: /proc/sys/fs/may_detach_mounts

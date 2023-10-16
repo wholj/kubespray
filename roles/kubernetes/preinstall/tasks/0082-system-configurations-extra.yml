@@ -25,22 +25,6 @@
     mode: 0755
 
 #=================================================================
-- name: Enable net.ipv4.conf.all.rp_filter
-  ansible.posix.sysctl:
-    sysctl_file: "{{ sysctl_file_path }}"
-    name: net.ipv4.conf.all.rp_filter
-    value: "0"
-    state: present
-    reload: yes
-
-- name: Enable net.ipv4.conf.default.rp_filter
-  ansible.posix.sysctl:
-    sysctl_file: "{{ sysctl_file_path }}"
-    name: net.ipv4.conf.default.rp_filter
-    value: "0"
-    state: present
-    reload: yes
-
 - name: modify vm.max_map_count value
   ansible.posix.sysctl:
     sysctl_file: "{{ sysctl_file_path }}"
